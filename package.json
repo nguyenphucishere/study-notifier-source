@@ -1,0 +1,28 @@
+{
+  "name": "study-notification",
+  "productName": "study-notification",
+  "description": "",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "1.0.0",
+  "author": "thienphucdev",
+  "scripts": {
+    "start": "electron .",
+    "build-css": "npx tailwindcss -i ./src/css/index.css -o ./public/css/index.css",
+    "watch-css": "npx tailwindcss -i ./src/css/index.css -o ./public/css/index.css --watch",
+    "production-css": "NODE_ENV=production npx tailwind -i ./src/css/index.css -o ./public/css/index.css"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "hot-formula-parser": "^4.0.0",
+    "vue": "^2.6.14"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "electron": "14.0.0-beta.5",
+    "electron-packager": "^15.4.0",
+    "postcss": "^8.3.11",
+    "tailwindcss": "^2.2.19",
+    "webpack": "^5.64.1"
+  }
+}

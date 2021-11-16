@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" 
+      content="script-src 'unsafe-inline' 'unsafe-eval' 'self' https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js">
+
+    <link rel="stylesheet" href="../../public/css/index.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css" type="text/css"/>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="../js/init.js"></script>
+
+    <title>Subject notifier</title>
+  </head>
+  <body class="overflow-x-hidden">
+    <div id="app">
+      <div class="topbar relative">
+        <div class="item">
+          {{ time }}
+        </div>
+
+        <div class="item ml-auto setting cursor-pointer" @click="toggleSettingPopup()">
+          <i class="bi bi-gear-fill"></i>
+        </div>
+
+        <div class="transparent-layer bg-transparent fixed top-0 left-0 w-[100vw] h-[100vh]"
+              @click.self="toggleSettingPopup()" v-show="isSettingPopupOpen">
+        </div>
+        <div class="setting-popup" v-show="isSettingPopupOpen">
+          <div class="setting-item">
+            Show only current subject 
+            <label class="toggle-control">
+              <input type="checkbox" v-model="isShowCurrentSubjectOnly" @change="toggleShowCurrentSubjectOnly()">
+              <span class="control"></span>
+            </label>
+          </div>
+
+          <div class="setting-item cursor-pointer" @click="showAppInformation()">
+            App information 
+          </div>
+        </div>
+
+      </div>
+      
+      
+      <div class="p-2 duration-150 transition-all" v-if="(!isShowCurrentSubjectOnly && todayTimetable)">
+        <subject-item v-for="subject in todayTimetable" 
+        :currentsbj="currentId" :subject_info="subject" 
+        :key="subject.id" @delete="deleteNotification()" @edit-save="save()"></subject-item>
+
+      </div>
+      <div class="current-subject-info p-2 w-[100vw]" v-if="(isShowCurrentSubjectOnly && todayTimetable)">
+        <div v-if="currentSubject" class="flex w-full h-full">
+          <div class="w-[48%] pl-4 flex justify-end items-center" v-if="currentSubject.teacher">
+            <img class="w-[50%]" src="../../public/img/zoom-meeting-logo.png" v-if="currentSubject.room_id"  alt="">
+            <img class="w-[50%]" src="../../public/img/google-meet-logo.png" v-else>
+          </div>
+          <div v-else class="w-[48%] flex flex-col items-center justify-center">
+            <span class="text-xl mb-3">Choose a song and enjoy!</span>
+            <button id="open-spotify" @click="openSpotify()" class="play-on-spotify-btn">
+              Play on Spotify
+            </button>
+            <div class="text-sm mt-3">
+              Or choose a Youtube song
+            </div>
+            <button id="open-youtube mb-3" @onclick="openYouTube()"
+              class="play-on-youtube-btn">
+              Play on Youtube
+            </button>
+          </div>
+          <div class="flex-1 flex flex-col justify-center pl-[3rem]">
+            <div class="text-3xl">{{ currentSubject.subject }} <span v-if="currentSubject.teacher">- {{ currentSubject.teacher }}</span></div>
+    
+            <div class="mb-2 text-gray-700 text-sm">
+              {{ currentSubject.start_time }} - {{ currentSubject.end_time }}
+            </div>
+            <div v-if="currentSubject.room_id">
+              <b>ID:</b> <span class="select-all">{{ currentSubject.room_id }}</span>
+            </div>
+            <div v-if="currentSubject.room_id">
+              <b>Password:</b> <span class="spoiler select-all">{{ currentSubject.pwd }}</span>
+            </div>
+            <div v-if="currentSubject.room_id" class="mt-4">
+              <a class="px-3 py-2 bg-blue-500 transition-all text-white rounded-lg hover:rounded-md hover:bg-blue-600" :href="'zoommtg://zoom.us/join?confno=' + currentSubject.room_id.split` `.join`` + '&pwd=' + currentSubject.pwd">
+                Join Now
+              </a>
+            </div>
+            <div v-else class="mt-4">
+              <a :href="currentSubject.meet_link" target="_blank"
+                class="px-3 py-2 bg-[#34a853] transition-all text-white rounded-lg hover:rounded-md hover:bg-[#fbbc05]">
+                Join Now
+              </a>
+              <div class="mt-4">
+                If you can't join, login Google <a href="https://myaccount.google.com/" target="_blank" class="text-blue-600">here</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="flex h-full w-full items-center justify-center flex-col">
+          <div class="text-lg">Oh, there isn't any subject now :D Sweet</div>
+          <img class="w-60 h-60 mt-4" src="../../public/img/img-sorry.png"/>
+        </div>
+      </div>
+      
+
+      <notification :msg="messagePopup" v-if="messagePopup != false"></notification>
+      <notification :msg="'Deleted item'" v-if="showDeletedNotification">
+        <div class="text-blue-600 cursor-pointer" @click="setUndo()" @editSave="editElement()">Undo</div>
+      </notification>
+      <div class="add-btn" @click="toggleAdd()">
+        <i class="bi bi-plus-lg center-ico"></i>
+      </div>
+      <add-modal @add-save="addElement()" @close-modal="delay(toggleAdd, 0.3 * 1000)" :subject_data="newSubject" v-if="isAdd"></add-modal>
+    </div>
+
+    <div class="refresh-btn"
+    onclick="window.location.reload(true)">
+      <i class="bi bi-arrow-clockwise center-ico"></i>
+    </div>
+    
+
+
+    <script src="../js/components/modal.js"></script>
+    <script src="../js/components/subject-item.js"></script>
+    <script src="../js/components/add-modal.js"></script>
+    <script src="../js/components/edit-modal.js"></script>
+    <script src="../js/components/notification.js"></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>
